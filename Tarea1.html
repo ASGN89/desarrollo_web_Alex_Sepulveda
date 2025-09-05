@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Adopciones • Tarea 1</title>
+<style>
+:root{--bg:#0f172a;--card:#111827;--muted:#94a3b8;--ink:#e5e7eb;--c1:#22d3ee;--c2:#a78bfa}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;background:#0b1026;color:var(--ink)}
+header{position:sticky;top:0;background:#020617cc;backdrop-filter:blur(8px);border-bottom:1px solid #1f2937;z-index:5}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+h1{margin:8px 0 0;font-weight:800;letter-spacing:.3px;font-size:clamp(20px,3vw,28px)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+nav a{padding:10px 14px;border:1px solid #1f2937;border-radius:999px;text-decoration:none;color:var(--ink);background:#0b1026}
+nav a.active,nav a:hover{outline:2px solid #1f2937;background:#0f172a}
+main{padding:24px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:16px;box-shadow:0 8px 24px #0006}
+.muted{color:var(--muted);font-size:.95rem}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid #1f2937;padding:10px;text-align:left;vertical-align:top}
+tbody tr{cursor:pointer}tbody tr:hover{background:#0f172a}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#0b2530;color:#9be9ff;border:1px solid #123a46;font-size:.85rem}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>.col{flex:1 1 240px}
+label{display:block;margin:8px 0 6px}
+input,select,textarea,button{width:100%;background:#0b1026;color:var(--ink);border:1px solid #1f2937;border-radius:10px;padding:10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 4px #0ea5e91a}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{cursor:pointer}.btn.primary{background:linear-gradient(90deg,#06b6d4,#22d3ee);color:#041017;border:none}.btn.ghost{background:#0b1026}
+.error{color:#ef4444;margin:4px 0}.ok{color:#22c55e}.hide{display:none}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.thumb{width:320px;max-width:100%;height:240px;object-fit:cover;border-radius:12px;border:1px solid #1f2937}
+.modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:20px}.modal.open{display:flex}
+.modal-inner{background:#0b1026;border:1px solid #1f2937;border-radius:16px;padding:12px;max-width:840px}
+.modal img{width:800px;max-width:95vw;height:600px;max-height:80vh;object-fit:contain;display:block}
+.chart{display:block;width:100%;height:260px;object-fit:contain;background:#0b1026;border:1px solid#1f2937;border-radius:12px;}
+
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🐾 Adopciones de Perros y Gatos — Prototipo</h1>
+    <nav>
+      <a href="#/" data-route class="active">Portada</a>
+      <a href="#/agregar" data-route>Agregar aviso de adopción</a>
+      <a href="#/listado" data-route>Ver listado de adopciones</a>
+      <a href="#/estadisticas" data-route>Estadísticas</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  <section id="view-home" class="card">
+    <h2>Bienvenid@</h2>
+    <p class="muted">Prototipo sin backend.</p>
+    <div class="grid" id="home-latest"></div>
+  </section>
+
+  <section id="view-add" class="card hide">
+    <h2>Agregar aviso de adopción</h2>
+    <form id="form-add" novalidate>
+      <div class="row">
+        <div class="col">
+          <label for="region">Región</label>
+          <select id="region"><option value="">Seleccione...</option></select>
+          <div class="error" data-err="region"></div>
+        </div>
+        <div class="col">
+          <label for="comuna">Comuna</label>
+          <select id="comuna"><option value="">Seleccione una región primero</option></select>
+          <div class="error" data-err="comuna"></div>
+        </div>
+        <div class="col">
+          <label for="sector">Sector (opcional, máx 100)</label>
+          <input id="sector" maxlength="100"/>
+          <div class="error" data-err="sector"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="nombre">Nombre (3–200)</label>
+          <input id="nombre" maxlength="200"/>
+          <div class="error" data-err="nombre"></div>
+        </div>
+        <div class="col">
+          <label for="email">Email (máx 100)</label>
+          <input id="email" maxlength="100"/>
+          <div class="error" data-err="email"></div>
+        </div>
+        <div class="col">
+          <label for="cel">Celular (Chile)</label>
+          <input id="cel" placeholder="+56912345678"/>
+          <div class="error" data-err="cel"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="tipo">Tipo</label>
+          <select id="tipo"><option value="">Seleccione...</option><option value="gato">Gato</option><option value="perro">Perro</option></select>
+          <div class="error" data-err="tipo"></div>
+        </div>
+        <div class="col">
+          <label for="cantidad">Cantidad (≥1)</label>
+          <input id="cantidad" type="number" inputmode="numeric"/>
+          <div class="error" data-err="cantidad"></div>
+        </div>
+        <div class="col">
+          <label for="edad">Edad (≥1)</label>
+          <input id="edad" type="number" inputmode="numeric"/>
+          <div class="error" data-err="edad"></div>
+        </div>
+        <div class="col">
+          <label for="unidad">Unidad</label>
+          <select id="unidad"><option value="">Seleccione...</option><option value="meses">Meses</option><option value="años">Años</option></select>
+          <div class="error" data-err="unidad"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label for="fecha_entrega">Fecha disponible</label>
+          <input id="fecha_entrega" type="date"/>
+          <div class="error" data-err="fecha_entrega"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label>Fotos (máx 5)</label>
+          <div id="fotos-wrap" class="row" style="gap:8px"><input type="file" accept="image/*"/></div>
+          <div class="actions"><button class="btn ghost" id="btn-add-foto" type="button">Agregar otra foto</button></div>
+          <div class="error" data-err="fotos"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="btn-submit" type="submit">Agregar este aviso de adopción</button>
+        <button class="btn ghost" type="reset">Limpiar</button>
+      </div>
+    </form>
+
+    <div class="modal" id="confirm-modal" aria-modal="true" role="dialog">
+      <div class="modal-inner">
+        <h3>¿Está seguro que desea agregar este aviso de adopción?</h3>
+        <div class="actions">
+          <button class="btn primary" id="confirm-yes" type="button">Sí, estoy seguro</button>
+          <button class="btn ghost" id="confirm-no" type="button">No, quiero volver al formulario</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="add-success" class="confirm hide">
+      <p class="ok"><strong>Hemos recibido la información de adopción, muchas gracias y suerte!</strong></p>
+      <div class="actions"><a href="#/" class="btn">Volver a la portada</a></div>
+    </div>
+  </section>
+
+  <section id="view-list" class="card hide">
+    <h2>Listado de avisos de adopción</h2>
+    <div class="muted">Haga clic en una fila para ver el detalle.</div>
+    <table><thead><tr>
+      <th>Fecha publicación</th><th>Fecha entrega</th><th>Comuna</th><th>Sector</th>
+      <th>Cantidad</th><th>Tipo / Edad</th><th>Nombre contacto</th><th>Total fotos</th>
+    </tr></thead><tbody id="list-tbody"></tbody></table>
+  </section>
+
+  <section id="view-detail" class="card hide">
+    <div class="actions" style="justify-content:space-between">
+      <div><a href="#/listado" class="btn">← Volver al listado</a> <a href="#/" class="btn">Volver a la portada</a></div>
+    </div>
+    <h2 id="detail-title">Detalle del aviso</h2>
+    <div id="detail-content"></div>
+  </section>
+
+<section id="view-stats" class="card hide">
+  <h2>Estadísticas</h2>
+  <div class="grid">
+    <div>
+      <h3>Línea: avisos por día</h3>
+      <img src="img/grafico_linea.jpg" class="chart" alt="Avisos por día"/>
+    </div>
+    <div>
+      <h3>Torta: total por tipo</h3>
+      <img src="img/grafico_torta.jpg" class="chart" alt="Total por tipo"/>
+    </div>
+    <div>
+      <h3>Barras: gatos vs perros por mes</h3>
+      <img src="img/grafico_barras.jpg" class="chart" alt="Gatos vs perros por mes"/>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="modal" id="photo-modal" role="dialog" aria-modal="true">
+  <div class="modal-inner">
+    <img id="photo-big" alt="Foto 800x600"/>
+    <div class="actions"><button class="btn close" id="photo-close" type="button">Cerrar</button></div>
+  </div>
+</div>
+<script src="regiones_comunas.js"></script>
+<script>
+(function(){
+  const seed = [
+    { id:1, publicado:'2025-08-18T12:00:00', entrega:'2025-08-20', region:'Metropolitana', comuna:'Santiago', sector:'Beauchef 850, terraza', tipo:'perro', cantidad:1, edad:3, unidad:'meses', contacto:{nombre:'Camila R.', email:'camila@example.com', cel:'+56912345678'}, fotos:['img/perro_3m_1.jpg'] },
+    { id:2, publicado:'2025-08-17T19:00:00', entrega:'2025-08-25', region:'Metropolitana', comuna:'Ñuñoa', sector:'Plaza Ñuñoa', tipo:'gato', cantidad:2, edad:2, unidad:'meses', contacto:{nombre:'Diego S.', email:'diego@example.com', cel:'+56987654321'}, fotos:['img/gatos_2m_1.jpg','img/gatos_2m_2.jpg','img/gatos_2m_3.jpg','img/gatos_2m_4.jpg'] },
+    { id:3, publicado:'2022-08-17T18:00:00', entrega:'2022-08-19', region:'Metropolitana', comuna:'Santiago', sector:"Parque O'Higgins", tipo:'gato', cantidad:1, edad:1, unidad:'mes', contacto:{nombre:'Laura T.', email:'laura@example.com', cel:'+56911122233'}, fotos:['img/gato_1m_1.jpg'] },
+    { id:4, publicado:'2025-08-19T10:30:00', entrega:'2025-08-22', region:'Valparaíso', comuna:'Viña del Mar', sector:'Reñaca', tipo:'gato', cantidad:1, edad:3, unidad:'años', contacto:{nombre:'Isabel Q.', email:'isabel@example.com', cel:'+56999887766'}, fotos:['img/gato_3a_1.jpg','img/gato_3a_2.jpg','img/gato_3a_3.jpg'] },
+    { id:5, publicado:'2025-08-16T09:15:00', entrega:'2025-08-21', region:'Biobío', comuna:'Concepción', sector:'Barrio Universitario', tipo:'perro', cantidad:3, edad:1, unidad:'mes', contacto:{nombre:'Pablo H.', email:'pablo@example.com', cel:'+56955544433'}, fotos:['img/perro_1m_1.jpg','img/perro_1m_2.jpg','img/perro_1m_3.jpg'] }
+  ];
+
+  const $ = (s,c=document)=>c.querySelector(s);
+  const $$ = (s,c=document)=>Array.from(c.querySelectorAll(s));
+  const fmt=(iso)=>{const d=new Date(iso);return{date:d.toISOString().slice(0,10),time:String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}};
+
+  function setRoute(hash){
+    $$('[data-route]').forEach(a=>a.classList.remove('active'));
+    const link = Array.from($$('[data-route]')).find(a=>a.getAttribute('href')===hash); if(link) link.classList.add('active');
+    $('#view-home').classList.add('hide');$('#view-add').classList.add('hide');$('#view-list').classList.add('hide');$('#view-detail').classList.add('hide');$('#view-stats').classList.add('hide');
+    if(hash.startsWith('#/agregar')) $('#view-add').classList.remove('hide');
+    else if(hash.startsWith('#/listado')) { $('#view-list').classList.remove('hide'); renderList(); }
+    else if(hash.startsWith('#/detalle/')) { const id=parseInt(hash.split('/')[2],10); $('#view-detail').classList.remove('hide'); openDetail(id); }
+    else if(hash.startsWith('#/estadisticas')) { $('#view-stats').classList.remove('hide'); }
+    else { $('#view-home').classList.remove('hide'); renderHome(); }
+  }
+
+  // Portada con fallback
+  function renderHome(){
+    const cont = $('#home-latest'); cont.innerHTML='';
+    [...seed].sort((a,b)=>new Date(b.publicado)-new Date(a.publicado)).slice(0,5).forEach(it=>{
+      const {date,time}=fmt(it.publicado);
+      const card = document.createElement('article'); card.className='card';
+      const right = document.createElement('div'); right.style.maxWidth='200px'; right.style.float='right';
+      const img = document.createElement('img'); img.className='thumb'; img.alt='Foto de '+it.tipo; img.src=it.fotos[0]; img.onerror=()=>{ img.src='img/placeholder_320x240.png'; };
+      right.appendChild(img);
+      const info = '<div class="muted">'+date+' · '+time+'</div>'
+        + '<h3 style="margin:6px 0">'+it.comuna+' <span class="muted">'+(it.sector||'')+'</span></h3>'
+        + '<div class="row"><span class="pill">'+it.cantidad+' '+it.tipo+(it.cantidad>1?'s':'')+'</span> <span class="pill">'+it.edad+' '+it.unidad+'</span></div>';
+      card.innerHTML=info; card.prepend(right); cont.appendChild(card);
+    });
+  }
+
+  // Listado
+  function renderList(){
+    const body=$('#list-tbody'); body.innerHTML='';
+    seed.forEach(it=>{
+      const {date,time}=fmt(it.publicado);
+      const tr=document.createElement('tr'); tr.tabIndex=0;
+      tr.addEventListener('click',()=>{location.hash='#/detalle/'+it.id}); tr.addEventListener('keypress',e=>{if(e.key==='Enter') location.hash='#/detalle/'+it.id});
+      tr.innerHTML='<td>'+date+' '+time+'</td><td>'+it.entrega+'</td><td>'+it.comuna+'</td><td>'+(it.sector||'-')+'</td><td>'+it.cantidad+'</td><td>'+it.tipo+' / '+it.edad+' '+it.unidad+'</td><td>'+it.contacto.nombre+'</td><td>'+it.fotos.length+'</td>';
+      body.appendChild(tr);
+    });
+  }
+
+  // Detalle
+  function openDetail(id){
+    const it=seed.find(x=>x.id===id); if(!it) return;
+    $('#detail-title').textContent = it.cantidad+' '+it.tipo+(it.cantidad>1?'s':'')+' en '+it.comuna;
+    const {date,time}=fmt(it.publicado);
+    $('#detail-content').innerHTML = '<div class="row">'
+      + '<div class="col"><strong>Publicado</strong><br>'+date+' '+time+'</div>'
+      + '<div class="col"><strong>Entrega</strong><br>'+it.entrega+'</div>'
+      + '<div class="col"><strong>Ubicación</strong><br>'+it.region+', '+it.comuna+(it.sector?', '+it.sector:'')+'</div>'
+      + '<div class="col"><strong>Contacto</strong><br>'+it.contacto.nombre+'<br>'+it.contacto.email+'<br>'+it.contacto.cel+'</div>'
+      + '</div><div class="row" style="margin-top:8px">'
+      + '<div class="col"><strong>Tipo</strong><br>'+it.tipo+'</div>'
+      + '<div class="col"><strong>Cantidad</strong><br>'+it.cantidad+'</div>'
+      + '<div class="col"><strong>Edad</strong><br>'+it.edad+' '+it.unidad+'</div>'
+      + '</div><h3 style="margin-top:16px">Galería</h3>'
+      + '<div class="gallery">'+it.fotos.map((src,i)=>'<img class="thumb" alt="Foto '+(i+1)+'" src="'+src+'" data-big="'+src+'">').join('')+'</div>';
+    $$('#detail-content .thumb').forEach(img=>{
+      img.addEventListener('click',()=>{ $('#photo-big').src=img.getAttribute('data-big'); $('#photo-modal').classList.add('open'); });
+      img.onerror=()=>{ img.src='img/placeholder_320x240.png'; };
+    });
+  }
+
+
+
+  // Formulario (regiones + validación + confirmación)
+  const regiones={'Metropolitana':['Santiago','Ñuñoa','Providencia','Maipú','Puente Alto'],'Valparaíso':['Valparaíso','Viña del Mar','Quilpué'],'Biobío':['Concepción','Talcahuano','Chiguayante']};
+  function initRegiones(){
+  const selR = document.getElementById('region');
+  const selC = document.getElementById('comuna');
+
+
+  selR.innerHTML = '<option value="">Seleccione...</option>' +
+    Object.keys(REGIONES_COMUNAS)
+      .sort((a,b)=>a.localeCompare(b,'es'))
+      .map(r=>`<option value="${r}">${r}</option>`)
+      .join('');
+
+  selR.addEventListener('change', ()=>{
+    const r = selR.value;
+    const comunas = (REGIONES_COMUNAS[r] || []).slice().sort((a,b)=>a.localeCompare(b,'es'));
+    selC.innerHTML = r
+      ? '<option value="">Seleccione...</option>' + comunas.map(c=>`<option value="${c}">${c}</option>`).join('')
+      : '<option value="">Seleccione una región primero</option>';
+  });
+}
+
+  function val(){ const e={}; const g=id=>$('#'+id).value.trim(); if(!$('#region').value) e.region='Seleccione una región.'; if(!$('#comuna').value) e.comuna='Seleccione una comuna.'; if(g('sector').length>100) e.sector='Máximo 100 caracteres.'; if(g('nombre').length<3||g('nombre').length>200) e.nombre='Entre 3 y 200 caracteres.'; const mail=g('email'); const ok=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail); if(!ok||mail.length>100) e.email='Email inválido o muy largo.'; const cel=g('cel').replace(/\s|\.|-/g,''); if(!/(\+?56)?0?9\d{8}$/.test(cel)) e.cel='Formato válido: +569XXXXXXXX o 9XXXXXXXX.'; if(!$('#tipo').value) e.tipo='Seleccione tipo.'; const cant=parseInt(g('cantidad'),10); if(!Number.isInteger(cant)||cant<1) e.cantidad='≥ 1.'; const edad=parseInt(g('edad'),10); if(!Number.isInteger(edad)||edad<1) e.edad='≥ 1.'; if(!$('#unidad').value) e.unidad='Seleccione unidad.'; if(!$('#fecha_entrega').value) e.fecha_entrega='Seleccione fecha.'; const files=$$('#fotos-wrap input[type=file]').length; if(files>5) e.fotos='Máximo 5.'; $$('.error').forEach(x=>x.textContent=''); Object.entries(e).forEach(([k,v])=>{ const el=$('.error[data-err='+k+']'); if(el) el.textContent=v;}); return Object.keys(e).length===0; }
+  $('#btn-add-foto').onclick=()=>{ const w=$('#fotos-wrap'); const n=w.querySelectorAll('input[type=file]').length; if(n>=5){ const box=$('.error[data-err=fotos]'); if(box) box.textContent='Máximo 5.'; return;} const inp=document.createElement('input'); inp.type='file'; inp.accept='image/*'; w.appendChild(inp); };
+  $('#form-add').onsubmit=(ev)=>{ ev.preventDefault(); if(!val()) return; $('#confirm-modal').classList.add('open'); };
+  $('#confirm-yes').onclick=()=>{ $('#confirm-modal').classList.remove('open'); $('#add-success').classList.remove('hide'); $('#add-success').scrollIntoView({behavior:'smooth'}); };
+  $('#confirm-no').onclick=()=>$('#confirm-modal').classList.remove('open');
+
+  // Modal foto
+  $('#photo-close').onclick=()=>$('#photo-modal').classList.remove('open');
+  $('#photo-modal').addEventListener('click',e=>{ if(e.target.id==='photo-modal') $('#photo-modal').classList.remove('open'); });
+
+  // Init
+  initRegiones(); renderHome(); setRoute(location.hash||'#/'); window.addEventListener('hashchange',()=> setRoute(location.hash||'#/'));
+})();
+</script>
+</body>
+</html>
