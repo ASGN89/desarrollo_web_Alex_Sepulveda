@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}Adopciones • Tarea 2{% endblock %}</title>
+  <style>
+:root{--bg:#0f172a;--card:#111827;--muted:#94a3b8;--ink:#e5e7eb}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,sans-serif;background:#0b1026;color:var(--ink)}
+header{position:sticky;top:0;background:#020617cc;backdrop-filter:blur(8px);border-bottom:1px solid #1f2937;z-index:5}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+h1{margin:8px 0 0;font-weight:800;letter-spacing:.3px;font-size:clamp(20px,3vw,28px)}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+nav a{padding:10px 14px;border:1px solid #1f2937;border-radius:999px;text-decoration:none;color:var(--ink);background:#0b1026}
+nav a.active,nav a:hover{outline:2px solid #1f2937;background:#0f172a}
+main{padding:24px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:16px;box-shadow:0 8px 24px #0006}
+.muted{color:var(--muted);font-size:.95rem}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid #1f2937;padding:10px;text-align:left;vertical-align:top}
+tbody tr{cursor:pointer}tbody tr:hover{background:#0f172a}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#0b2530;color:#9be9ff;border:1px solid #123a46;font-size:.85rem}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>.col{flex:1 1 240px}
+label{display:block;margin:8px 0 6px}
+input,select,textarea,button{width:100%;background:#0b1026;color:var(--ink);border:1px solid #1f2937;border-radius:10px;padding:10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#334155;box-shadow:0 0 0 4px #0ea5e91a}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.btn{cursor:pointer}.btn.primary{background:linear-gradient(90deg,#06b6d4,#22d3ee);color:#041017;border:none}.btn.ghost{background:#0b1026}
+.ok{color:#22c55e}.error{color:#ef4444}
+.thumb{width:320px;max-width:100%;height:240px;object-fit:cover;border-radius:12px;border:1px solid #1f2937}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🐾 Adopciones de Perros y Gatos</h1>
+    <nav>
+      <a href="{{ url_for('home') }}" class="{% if request.endpoint=='home' %}active{% endif %}">Portada</a>
+      <a href="{{ url_for('agregar') }}" class="{% if request.endpoint=='agregar' %}active{% endif %}">Agregar aviso</a>
+      <a href="{{ url_for('avisos') }}" class="{% if request.endpoint in ('listado','avisos') %}active{% endif %}">Ver listado</a>
+      <a href="{{ url_for('estadisticas') }}" class="{% if request.endpoint=='estadisticas' %}active{% endif %}">Estadísticas</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      <div class="card">{% for cat,msg in msgs %}<div class="{{ 'ok' if cat=='success' else 'error' }}">{{ msg }}</div>{% endfor %}</div>
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

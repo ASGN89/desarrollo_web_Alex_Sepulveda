@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% block title %}Agregar aviso • Adopciones{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Agregar aviso de adopción</h2>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    <div class="row">
+      <div class="col">
+        <label>Región</label>
+        <select id="region" name="region_id" required>
+          {% for r in regiones %}<option value="{{ r.id }}" {% if data.region_id|default('')|string == r.id|string %}selected{% endif %}>{{ r.nombre }}</option>{% endfor %}
+        </select>
+        {% if errors.region_id %}<div class="error">{{ errors.region_id }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Comuna</label>
+        <select id="comuna" name="comuna_id" required>
+          {% for c in comunas %}<option value="{{ c.id }}" {% if data.comuna_id|default('')|string == c.id|string %}selected{% endif %}>{{ c.nombre }}</option>{% endfor %}
+        </select>
+        {% if errors.comuna_id %}<div class="error">{{ errors.comuna_id }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Sector (opcional, máx 100)</label>
+        <input name="sector" maxlength="100" value="{{ data.sector|default('') }}"/>
+        {% if errors.sector %}<div class="error">{{ errors.sector }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Nombre (3–200)</label>
+        <input name="nombre" maxlength="200" value="{{ data.nombre|default('') }}" required/>
+        {% if errors.nombre %}<div class="error">{{ errors.nombre }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Email (máx 100)</label>
+        <input type="email" name="email" maxlength="100" value="{{ data.email|default('') }}" required/>
+        {% if errors.email %}<div class="error">{{ errors.email }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Celular</label>
+        <input name="celular" value="{{ data.celular|default('') }}" placeholder="+56912345678"/>
+        {% if errors.celular %}<div class="error">{{ errors.celular }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Tipo</label>
+        <select name="tipo" required>
+          <option value="perro" {% if data.tipo=='perro' %}selected{% endif %}>Perro</option>
+          <option value="gato" {% if data.tipo=='gato' %}selected{% endif %}>Gato</option>
+        </select>
+        {% if errors.tipo %}<div class="error">{{ errors.tipo }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Cantidad (≥1)</label>
+        <input name="cantidad" value="{{ data.cantidad|default('') }}" required/>
+        {% if errors.cantidad %}<div class="error">{{ errors.cantidad }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Edad (≥1)</label>
+        <input name="edad" value="{{ data.edad|default('') }}" required/>
+        {% if errors.edad %}<div class="error">{{ errors.edad }}</div>{% endif %}
+      </div>
+      <div class="col">
+        <label>Unidad</label>
+        <select name="unidad_medida" required>
+          <option value="m" {% if data.unidad_medida=='m' %}selected{% endif %}>meses</option>
+          <option value="a" {% if data.unidad_medida=='a' %}selected{% endif %}>años</option>
+        </select>
+        {% if errors.unidad_medida %}<div class="error">{{ errors.unidad_medida }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Fecha disponible</label>
+        <input type="datetime-local" name="fecha_entrega" value="{{ data.fecha_entrega|default('') }}" required/>
+        {% if errors.fecha_entrega %}<div class="error">{{ errors.fecha_entrega }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label>Fotos (mínimo 1, máx 5)</label>
+        <input type="file" name="fotos" accept="image/*" multiple required/>
+        {% if errors.fotos %}<div class="error">{{ errors.fotos }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" type="submit">Agregar este aviso de adopción</button>
+      <a class="btn" href="{{ url_for('home') }}">Cancelar</a>
+    </div>
+  </form>
+</section>
+
+<script>
+(async function () { 
+  const $region = document.getElementById('region');
+  const $comuna = document.getElementById('comuna');
+  async function cargarComunas(regionId, preselectId) {
+    $comuna.innerHTML = '<option value="">Cargando…</option>';
+    try {
+      const res = await fetch(`/api/comunas?region_id=${encodeURIComponent(regionId)}`);
+      const data = await res.json();
+      $comuna.innerHTML = '';
+      for (const c of data) {
+        const opt = document.createElement('option');
+        opt.value = c.id; opt.textContent = c.nombre;
+        if (preselectId && String(preselectId)===String(c.id)) opt.selected = true;
+        $comuna.appendChild(opt);
+      }
+      if (!$comuna.value && data.length) $comuna.value = data[0].id;
+    } catch (e) {
+      $comuna.innerHTML = '<option value="">Error al cargar comunas</option>';
+    }
+  }
+  $region.addEventListener('change', ()=>{ if ($region.value) cargarComunas($region.value, null); });
+  const preR = $region.value; const preC = '{{ data.comuna_id|default("") }}';
+  if (preR) cargarComunas(preR, preC||null);
+})(); 
+</script>
+{% endblock %}

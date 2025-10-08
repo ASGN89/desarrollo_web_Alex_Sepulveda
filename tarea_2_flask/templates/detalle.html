@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Detalle • Adopciones{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="actions" style="justify-content:space-between">
+    <div><a href="{{ url_for('avisos') }}" class="btn">← Volver al listado</a> <a href="{{ url_for('home') }}" class="btn">Portada</a></div>
+  </div>
+  <h2>{{ aviso.cantidad }} {{ aviso.tipo }}{% if aviso.cantidad>1 %}s{% endif %} en {{ aviso.comuna.nombre }}</h2>
+  <div class="row">
+    <div class="col"><strong>Publicado</strong><br>{{ aviso.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</div>
+    <div class="col"><strong>Entrega</strong><br>{{ aviso.fecha_entrega.strftime('%Y-%m-%d %H:%M') }}</div>
+    <div class="col"><strong>Ubicación</strong><br>{{ aviso.comuna.region.nombre }}, {{ aviso.comuna.nombre }}{% if aviso.sector %}, {{ aviso.sector }}{% endif %}</div>
+    <div class="col"><strong>Contacto</strong><br>{{ aviso.nombre }}<br>{{ aviso.email }}<br>{{ aviso.celular or '' }}</div>
+  </div>
+  <h3 style="margin-top:16px">Galería</h3>
+  <div class="grid">
+    {% if aviso.fotos %}
+      {% for f in aviso.fotos %}
+        <img class="thumb" alt="Foto {{ loop.index }}" src="{{ url_for('uploaded_file', fn=f.ruta_archivo) }}"/>
+      {% endfor %}
+    {% else %}
+      <img class="thumb" alt="Sin foto" src="{{ url_for('static', filename='placeholder_320x240.png') }}"/>
+    {% endif %}
+  </div>
+  {% if aviso.descripcion %}<p style="margin-top:12px">{{ aviso.descripcion }}</p>{% endif %}
+</section>
+{% endblock %}
