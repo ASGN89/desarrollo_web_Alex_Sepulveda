@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Estadísticas • Adopciones{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Estadísticas</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Total por tipo</h3>
+      <p class="muted">Perros: {{ totales.perro }} · Gatos: {{ totales.gato }}</p>
+    </div>
+    <div class="card">
+      <h3>Avisos por día (últimos 14)</h3>
+      <table>
+        <thead><tr><th>Día</th><th>Total</th></tr></thead>
+        <tbody>
+          {% for d,t in por_dia %}<tr><td>{{ d }}</td><td>{{ t }}</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

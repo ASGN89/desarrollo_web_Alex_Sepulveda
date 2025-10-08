@@ -1,0 +1,20 @@
+*{box-sizing:border-box}
+body{font-family:system-ui,Segoe UI,Roboto,Arial,sans-serif;margin:0;background:#f7f7f8;color:#222}
+.container{max-width:960px;margin:0 auto;padding:1rem}
+header nav a{margin-right:1rem;text-decoration:none}
+table{border-collapse:collapse;width:100%;background:#fff}
+th,td{border:1px solid #ddd;padding:.5rem}
+tr:hover{background:#f0f0f5;cursor:pointer}
+.flash{list-style:none;padding:0}
+.flash li{padding:.5rem;margin:.25rem 0}
+.flash li.error{background:#ffe0e0;border:1px solid #f2b5b5}
+.flash li.success{background:#e6ffed;border:1px solid #b7e1c0}
+fieldset{border:1px solid #ddd;margin-bottom:1rem;padding:1rem;background:#fff}
+label{display:block;margin-bottom:.5rem}
+input,select,textarea,button{padding:.5rem;width:100%;max-width:100%}
+button{cursor:pointer;border:1px solid #333;background:#fff}
+.paginacion{display:flex;gap:1rem;align-items:center;margin-top:1rem}
+.detalle{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem}
+.galeria img{width:100%;height:auto;border:1px solid #ddd;background:#fff}
+@media (max-width:700px){.detalle{grid-template-columns:1fr}}
