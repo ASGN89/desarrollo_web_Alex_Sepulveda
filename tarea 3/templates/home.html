@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}Portada • Adopciones{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Últimos 5 avisos</h2>
+  <div class="grid">
+    {% for a in avisos %}
+    <article class="card">
+      <div class="muted">{{ a.fecha_ingreso.strftime('%Y-%m-%d %H:%M') }}</div>
+      <h3 style="margin:6px 0">{{ a.comuna.nombre }} <span class="muted">{{ a.sector or '' }}</span></h3>
+      <div class="row">
+        <span class="pill">{{ a.cantidad }} {{ a.tipo }}{% if a.cantidad>1 %}s{% endif %}</span>
+        <span class="pill">{{ a.edad }} {{ 'meses' if a.unidad_medida=='m' else 'años' }}</span>
+      </div>
+      {% set f = a.fotos[0].ruta_archivo if a.fotos else None %}
+      <img class="thumb" alt="Foto" src="{{ url_for('uploaded_file', fn=f) if f else url_for('static', filename='placeholder_320x240.png') }}">
+      <div class="actions"><a class="btn" href="{{ url_for('detalle', aviso_id=a.id) }}">Ver detalle</a></div>
+    </article>
+    {% else %}
+      <p class="muted">No hay avisos aún.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
