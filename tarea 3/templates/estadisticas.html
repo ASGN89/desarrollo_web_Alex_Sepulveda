@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Estadísticas • Adopciones{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Estadísticas</h2>
+  <div id="g_dia" style="height:360px;"></div>
+  <div id="g_tipo" style="height:360px; margin-top:24px;"></div>
+  <div id="g_mes"  style="height:360px; margin-top:24px;"></div>
+  <p style="margin-top:16px"><a class="btn" href="{{ url_for('home') }}">← Volver a portada</a></p>
+</section>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+(async () => {
+  // Línea por día
+  const d1 = await fetch("{{ url_for('estad_avisos_por_dia') }}").then(r=>r.json());
+  Highcharts.chart('g_dia', {
+    title:{text:'Avisos por día'},
+    xAxis:{categories:d1.map(x=>x.dia)}, yAxis:{title:{text:'Avisos'}},
+    series:[{name:'Total', data:d1.map(x=>x.total)}]
+  });
+
+  // Torta por tipo
+  const d2 = await fetch("{{ url_for('estad_por_tipo') }}").then(r=>r.json());
+  Highcharts.chart('g_tipo', {
+    chart:{type:'pie'}, title:{text:'Por tipo'},
+    series:[{name:'Avisos', data:d2.map(x=>({name:x.tipo, y:x.total}))}]
+  });
+
+  // Barras por mes (gato vs perro)
+  const d3 = await fetch("{{ url_for('estad_por_mes') }}").then(r=>r.json());
+  Highcharts.chart('g_mes', {
+    chart:{type:'column'}, title:{text:'Gatos vs Perros por mes'},
+    xAxis:{categories:d3.map(x=>x.mes)}, yAxis:{title:{text:'Avisos'}},
+    series:[
+      {name:'Gato',  data:d3.map(x=>x.gato)},
+      {name:'Perro', data:d3.map(x=>x.perro)}
+    ]
+  });
+})();
+</script>
+{% endblock %}
