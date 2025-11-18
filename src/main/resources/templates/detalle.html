@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Detalle • Adopciones</title>
+</head>
+<body>
+<div th:replace="~{base :: layout(~{::section})}">
+  <section class="card">
+
+    <!-- Accesos del encabezado -->
+    <div class="actions" style="justify-content:space-between">
+      <div>
+        <a th:href="@{/avisos}" class="btn">← Volver al listado</a>
+        <a th:href="@{/home}" class="btn">Portada</a>
+      </div>
+    </div>
+
+    <!-- Título -->
+    <h2>
+      <span th:text="${a.cantidad}">1</span>
+      <span th:text="${a.tipo}">gato</span><span th:if="${a.cantidad>1}">s</span>
+      en <span th:text="${a.comuna}">Santiago</span>
+    </h2>
+
+    <!-- Datos principales -->
+    <div class="row">
+      <div class="col"><strong>Publicado</strong><br><span th:text="${a.fechaPublicacion}">2025-01-01 12:00</span></div>
+      <div class="col"><strong>Entrega</strong><br><span th:text="${a.fechaEntrega}">2025-01-02 12:00</span></div>
+      <div class="col">
+        <strong>Ubicación</strong><br>
+        <span th:text="${a.region}">Región</span>,
+        <span th:text="${a.comuna}">Comuna</span>
+        <span th:if="${a.sector != null && a.sector != ''}">, <span th:text="${a.sector}"></span></span>
+      </div>
+      <div class="col">
+        <strong>Contacto</strong><br>
+        <span th:text="${a.nombre}">Nombre</span><br>
+        <span th:text="${a.email}">email</span><br>
+        <span th:text="${a.celular}">cel</span>
+      </div>
+    </div>
+
+    <!-- Galería -->
+    <h3 style="margin-top:16px">Galería</h3>
+    <div class="grid">
+      <img class="thumb" th:each="f: ${fotos}"
+           th:alt="|Foto ${f.id}|"
+           th:src="@{'/uploads/' + ${f.nombreArchivo}}"/>
+      <img class="thumb" th:if="${#lists.isEmpty(fotos)}"
+           th:src="@{/placeholder_320x240.png}" alt="Sin foto"/>
+    </div>
+
+    <!-- Descripción -->
+    <p th:if="${a.descripcion}" style="margin-top:12px" th:text="${a.descripcion}"></p>
+
+    <!-- ========================================= -->
+    <!--            EVALUACIÓN (1..7)              -->
+    <!-- ========================================= -->
+    <h3 style="margin-top:16px">Evaluación</h3>
+    <div id="box-notas" class="card" style="padding:12px">
+      <p>Promedio: <strong id="avg">—</strong> &nbsp;(<span id="cnt">0</span> votos)</p>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button type="button" class="btn" data-n="1">1</button>
+        <button type="button" class="btn" data-n="2">2</button>
+        <button type="button" class="btn" data-n="3">3</button>
+        <button type="button" class="btn" data-n="4">4</button>
+        <button type="button" class="btn" data-n="5">5</button>
+        <button type="button" class="btn" data-n="6">6</button>
+        <button type="button" class="btn" data-n="7">7</button>
+      </div>
+    </div>
+
+    <!-- ========================================= -->
+    <!--               COMENTARIOS                 -->
+    <!-- ========================================= -->
+    <h2 style="margin-top:20px">Comentarios</h2>
+    <ul class="comentarios"></ul>
+    <hr>
+    <h3>Dejar un comentario</h3>
+    <form id="form-comentario" th:action="@{/api/comentarios}" method="post" novalidate>
+      <input type="hidden" name="aviso_id" th:value="${a.id}">
+      <div><label>Nombre</label><input name="nombre" maxlength="100" required></div>
+      <div><label>Email</label><input name="email" type="email" maxlength="100" required></div>
+      <div><label>Comentario</label><textarea name="texto" maxlength="500" required></textarea></div>
+      <button type="submit" class="btn">Enviar</button>
+    </form>
+  </section>
+</div>
+
+<!-- JS unificado: comentarios + evaluación -->
+<script th:inline="javascript">
+  // ID del aviso desde Thymeleaf
+  const avisoId = /*[[${a.id}]]*/ 0;
+
+  // -------- Comentarios --------
+  const ul   = document.querySelector('.comentarios');
+  const form = document.getElementById('form-comentario');
+
+  async function cargarComentarios(){
+    try{
+      const url = /*[[@{/api/comentarios}]]*/ '/api/comentarios' + '?aviso_id=' + avisoId + '&t=' + Date.now();
+      const data = await fetch(url, {cache:'no-store'}).then(r=>r.json());
+      ul.innerHTML = data.map(c => {
+        const fecha  = c.fecha ? String(c.fecha).replace('T',' ') : '';
+        const email  = c.email ?? '';
+        const texto  = c.texto ?? '';
+        const nombre = c.nombre ?? '';
+        return `
+          <li>
+            <strong>\${nombre}</strong>
+            <small>(\${email}) \${fecha ? ' — ' + fecha : ''}</small>
+            <p>\${texto}</p>
+          </li>`;
+      }).join('');
+    }catch(e){
+      console.error('cargarComentarios() falló:', e);
+      ul.innerHTML = '';
+    }
+  }
+
+  // -------- Evaluación (1..7) --------
+  async function refrescarNotas(){
+    try{
+      const url = /*[[@{/api/notas}]]*/ '/api/notas' + '?avisoId=' + avisoId + '&t=' + Date.now();
+      const data = await fetch(url, {cache:'no-store'}).then(r=>r.json());
+      console.log('refrescarNotas ->', avisoId, data);
+      const avg = (data.promedio == null) ? '—' : Number(data.promedio).toFixed(2);
+      document.getElementById('avg').textContent = avg;
+      document.getElementById('cnt').textContent = Number(data.cantidad ?? 0);
+    }catch(e){
+      console.error('refrescarNotas() falló:', e);
+    }
+  }
+
+  document.querySelectorAll('#box-notas .btn').forEach(b=>{
+    b.addEventListener('click', async ()=>{
+      const body = { avisoId: avisoId, nota: Number(b.dataset.n) };
+      const res = await fetch(/*[[@{/api/notas}]]*/ '/api/notas', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(body)
+      });
+      if(!res.ok){ alert('No se pudo guardar la nota'); return; }
+      await refrescarNotas();
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    await Promise.allSettled([cargarComentarios(), refrescarNotas()]);
+  });
+</script>
+
+
+
+
+
+</body>
+</html>

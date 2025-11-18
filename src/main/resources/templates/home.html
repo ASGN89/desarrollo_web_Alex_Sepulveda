@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Portada • Adopciones</title>
+</head>
+<body>
+<!-- inyecta header + main de base.html -->
+<div th:replace="~{base :: layout(~{::section})}">
+  <section class="card">
+    <h2>Últimos 5 avisos</h2>
+
+    <div class="grid">
+      <article class="card" th:each="a : ${avisos}">
+        <div class="muted" th:text="${a.fechaPublicacion}">2025-01-01 12:00</div>
+
+        <h3 style="margin:6px 0">
+          <span th:text="${a.comuna}">Comuna</span>
+          <span class="muted" th:text="${a.sector}">Sector</span>
+        </h3>
+
+        <div class="row">
+          <span class="pill"
+                th:text="${a.cantidad} + ' ' + ${a.tipo} + (${a.cantidad} > 1 ? 's' : '')">2 gatos</span>
+          <span class="pill"
+                th:text="${a.edad} + ' ' + (${a.unidadMedida} == 'm' ? 'meses' : 'años')">3 meses</span>
+        </div>
+
+        <img class="thumb"
+             th:src="${a.foto} != null ? @{'/uploads/' + ${a.foto}} : @{/placeholder_320x240.png}"
+             alt="Foto">
+
+        <div class="actions">
+          <a class="btn" th:href="@{|/detalle/${a.id}|}">Ver detalle</a>
+        </div>
+      </article>
+
+      <p class="muted" th:if="${#lists.isEmpty(avisos)}">No hay avisos aún.</p>
+    </div>
+  </section>
+</div>
+</body>
+</html>
