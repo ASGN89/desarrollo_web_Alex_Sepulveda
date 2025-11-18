@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Listado • Adopciones</title>
+</head>
+<body>
+<div th:replace="~{base :: layout(~{::section})}">
+  <section class="card">
+    <h2>Listado de avisos de adopción</h2>
+    <div class="muted">Haga clic en una fila para ver el detalle.</div>
+
+    <table>
+      <thead>
+      <tr>
+        <th>Publicación</th>
+        <th>Entrega</th>
+        <th>Comuna</th>
+        <th>Sector</th>
+        <th>Cantidad</th>
+        <th>Tipo / Edad</th>
+        <th>Contacto</th>
+        <th>Fotos</th>
+        <th>nota</th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="a: ${avisos}"
+          th:onclick="|location='/detalle/' + ${a.id}|"
+          style="cursor:pointer">
+        <td th:text="${a.fechaPublicacion}">2025-01-01 12:00</td>
+        <td th:text="${a.fechaEntrega}">2025-01-02 12:00</td>
+        <td th:text="${a.comuna}">Santiago</td>
+        <td th:text="${a.sector} ?: '-'">-</td>
+        <td th:text="${a.cantidad}">1</td>
+        <td>
+          <span th:text="${a.tipo}">gato</span>
+          <span> / </span>
+          <span th:text="${a.edad}">2</span>
+          <span th:text="${a.unidadMedida}=='m' ? 'meses' : 'años'">meses</span>
+        </td>
+        <td th:text="${a.nombre}">Alex</td>
+        <td th:text="${a.fotos}">0</td>
+
+        <!-- Promedio dinámico -->
+        <td class="nota" th:attr="data-id=${a.id}">–</td>
+        <!-- Acción evaluar -->
+        <td>
+          <a href="#" class="eval" th:attr="data-id=${a.id}" onclick="event.stopPropagation()">evaluar</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="actions">
+      <a class="btn"
+         th:if="${pagination['hasPrev']}"
+         th:href="@{'/avisos'(page=${pagination['prev']})}">← Anterior</a>
+
+      <span class="muted">
+        Página <span th:text="${pagination['page']}">1</span>
+        de <span th:text="${pagination['pages']}">1</span>
+      </span>
+
+      <a class="btn"
+         th:if="${pagination['hasNext']}"
+         th:href="@{'/avisos'(page=${pagination['next']})}">Siguiente →</a>
+    </div>
+
+    <!-- JS SOLO PARA EVALUACIÓN -->
+    <script th:inline="javascript">
+      // Obtiene y pinta el promedio en la celda de cada aviso
+      async function pintarNota(id){
+        try{
+          const d = await fetch(/*[[@{/api/notas}]]*/'/api/notas?avisoId='+id).then(r=>r.json());
+          const avg = (d.promedio == null) ? '–' : Number(d.promedio).toFixed(1);
+          const cell = document.querySelector('td.nota[data-id="'+id+'"]');
+          if(cell) cell.textContent = avg;
+        }catch(_e){}
+      }
+
+      // Carga inicial del promedio para todas las filas visibles
+      document.querySelectorAll('td.nota').forEach(td=>{
+        const id = Number(td.dataset.id);
+        if(Number.isInteger(id)) pintarNota(id);
+      });
+
+      // Maneja el clic en "evaluar"
+      document.querySelectorAll('a.eval').forEach(a=>{
+        a.addEventListener('click', async (ev)=>{
+          ev.preventDefault();
+          ev.stopPropagation();
+          const id = Number(a.dataset.id);
+          let n = prompt('Selecciona una nota entre 1 y 7:', '7');
+          if(n === null) return;            // cancelado
+          n = Number(n);
+          if(!Number.isInteger(n) || n < 1 || n > 7){
+            alert('Nota inválida. Debe ser un entero entre 1 y 7.');
+            return;
+          }
+          const res = await fetch(/*[[@{/api/notas}]]*/'/api/notas', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({ avisoId: id, nota: n })
+          });
+          if(!res.ok){ alert('No se pudo guardar la nota'); return; }
+          // Refresca promedio
+          pintarNota(id);
+        });
+      });
+    </script>
+  </section>
+</div>
+</body>
+</html>

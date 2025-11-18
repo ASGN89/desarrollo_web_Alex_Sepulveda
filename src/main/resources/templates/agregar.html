@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% block title %}Agregar aviso • Adopciones{% endblock %}
+{% block content %}
+<section class="card">
+  <h2>Agregar aviso de adopción</h2>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    <div class="row">
+      <div class="col">
+        <label for="region">Región</label>
+        <select id="region" name="region_id" required>
+          <option value="" disabled hidden {% if not data.region_id %}selected{% endif %}>Seleccione una región</option>
+          {% for r in regiones %}
+            <option value="{{ r.id }}" {% if data.region_id|default('')|string == r.id|string %}selected{% endif %}>{{ r.nombre }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.region_id %}<div class="error">{{ errors.region_id }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="comuna">Comuna</label>
+        <select id="comuna" name="comuna_id" required>
+          <option value="" disabled hidden {% if not data.comuna_id %}selected{% endif %}>Seleccione una comuna</option>
+          {% for c in comunas %}
+            <option value="{{ c.id }}" {% if data.comuna_id|default('')|string == c.id|string %}selected{% endif %}>{{ c.nombre }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.comuna_id %}<div class="error">{{ errors.comuna_id }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="sector">Sector (opcional, máx 100)</label>
+        <input id="sector" name="sector" maxlength="100" value="{{ data.sector|default('') }}">
+        {% if errors.sector %}<div class="error">{{ errors.sector }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label for="nombre">Nombre (3–200)</label>
+        <input id="nombre" name="nombre" maxlength="200" value="{{ data.nombre|default('') }}" required>
+        {% if errors.nombre %}<div class="error">{{ errors.nombre }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="email">Email (máx 100)</label>
+        <input id="email" type="email" name="email" maxlength="100" value="{{ data.email|default('') }}" required>
+        {% if errors.email %}<div class="error">{{ errors.email }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="celular">Celular</label>
+        <input id="celular" name="celular" value="{{ data.celular|default('') }}" placeholder="+56912345678">
+        {% if errors.celular %}<div class="error">{{ errors.celular }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label for="tipo">Tipo</label>
+        <select id="tipo" name="tipo" required>
+          <option value="" disabled hidden {% if not data.tipo %}selected{% endif %}>Seleccione tipo</option>
+          <option value="perro" {% if data.tipo == 'perro' %}selected{% endif %}>Perro</option>
+          <option value="gato"  {% if data.tipo == 'gato'  %}selected{% endif %}>Gato</option>
+        </select>
+        {% if errors.tipo %}<div class="error">{{ errors.tipo }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="cantidad">Cantidad (≥1)</label>
+        <input id="cantidad" name="cantidad" value="{{ data.cantidad|default('') }}" required>
+        {% if errors.cantidad %}<div class="error">{{ errors.cantidad }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="edad">Edad (≥1)</label>
+        <input id="edad" name="edad" value="{{ data.edad|default('') }}" required>
+        {% if errors.edad %}<div class="error">{{ errors.edad }}</div>{% endif %}
+      </div>
+
+      <div class="col">
+        <label for="unidad_medida">Unidad</label>
+        <select id="unidad_medida" name="unidad_medida" required>
+          <option value="" disabled hidden {% if not data.unidad_medida %}selected{% endif %}>Seleccione unidad</option>
+          <option value="m" {% if data.unidad_medida == 'm' %}selected{% endif %}>meses</option>
+          <option value="a" {% if data.unidad_medida == 'a' %}selected{% endif %}>años</option>
+        </select>
+        {% if errors.unidad_medida %}<div class="error">{{ errors.unidad_medida }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label for="fecha_entrega">Fecha disponible</label>
+        <input id="fecha_entrega" type="datetime-local" name="fecha_entrega" value="{{ data.fecha_entrega|default('') }}" required>
+        {% if errors.fecha_entrega %}<div class="error">{{ errors.fecha_entrega }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <label for="fotos">Fotos (mínimo 1, máx 5)</label>
+        <input id="fotos" type="file" name="fotos" accept="image/*" multiple required>
+        {% if errors.fotos %}<div class="error">{{ errors.fotos }}</div>{% endif %}
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn primary" type="submit">Agregar este aviso de adopción</button>
+      <a class="btn" href="{{ url_for('home') }}">Cancelar</a>
+    </div>
+  </form>
+</section>
+
+<script>
+(async function () {
+  const $region = document.getElementById('region');
+  const $comuna = document.getElementById('comuna');
+
+  async function cargarComunas(regionId, preselectId) {
+    $comuna.innerHTML = '<option value="">Cargando…</option>';
+    try {
+      const res = await fetch(`/api/comunas?region_id=${encodeURIComponent(regionId)}`);
+      const data = await res.json();
+      $comuna.innerHTML = '<option value="" disabled hidden>Seleccione una comuna</option>';
+      for (const c of data) {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.nombre;
+        if (preselectId && String(preselectId) === String(c.id)) opt.selected = true;
+        $comuna.appendChild(opt);
+      }
+    } catch (e) {
+      $comuna.innerHTML = '<option value="">Error al cargar comunas</option>';
+    }
+  }
+
+  $region.addEventListener('change', () => {
+    if ($region.value) cargarComunas($region.value, null);
+  });
+
+  const preR = $region.value;
+  const preC = '{{ data.comuna_id|default("") }}';
+  if (preR) cargarComunas(preR, preC || null);
+})();
+</script>
+{% endblock %}

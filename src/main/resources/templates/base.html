@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title th:text="${pageTitle} ?: 'Adopciones'">Adopciones</title>
+  <link rel="stylesheet" th:href="@{/style.css}"/>
+</head>
+<body>
+<header style="border-bottom:1px solid #ddd;background:#fff">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between">
+    <h1 style="margin:0;font-size:1.25rem">Adopciones</h1>
+    <nav>
+      <a th:href="@{/home}"
+         th:classappend="${active}=='home' ? ' active' : ''">Portada</a>
+      <a th:href="@{/avisos}"
+         th:classappend="${active}=='avisos' ? ' active' : ''">Listado</a>
+      <a th:href="@{/estadisticas}"
+         th:classappend="${active}=='estadisticas' ? ' active' : ''">Estadísticas</a>
+      <a th:href="@{/agregar}"
+         th:classappend="${active}=='agregar' ? ' active' : ''">Agregar</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" th:fragment="layout(content)">
+  <div th:replace="${content}">Contenido</div>
+</main>
+
+<footer style="border-top:1px solid #ddd;background:#fff;margin-top:2rem">
+  <div class="container" style="font-size:.9rem;color:#666">
+    Tarea 4 • UCC
+  </div>
+</footer>
+</body>
+</html>
